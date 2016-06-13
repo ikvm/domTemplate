@@ -31,6 +31,9 @@
 
 domTemplate 模板引擎是通过在标签中添加自定义属性，实现动态模板功能，当没有引入domTemplate脚本， 则自定义标签属性不会被浏览器解析，不会破坏原有静态效果，当引入domTemplate脚本，模板引擎回去解析这些标签属性， 并加载数据进行动态渲染。 下图：对比服务器页面渲染和使用domTemplate前端引擎开发流程 
 
+| 服务器端模板解析 | domTemplate前端解析 |
+| ---- | ---- |
+|![before](https://github.com/parky18/domTemplate/blob/master/docs/images/before.jpg)|![after](https://github.com/parky18/domTemplate/blob/master/docs/images/after.jpg)|
 用法
 -----------
 导入`jquery.js`或者`zepto.js`和`domTemplate.js`
