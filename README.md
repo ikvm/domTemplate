@@ -247,7 +247,7 @@ each遍历标签
 自定义标签
 -----------
 ```javascript
- $.domTemplate.registerTag('tagName',function(ctx,exp){ }); //tagName 是自定义标签名称，用时要加上前缀，如定义'test'标签，用时h-test="" 
+ $.domTemplate.registerTag('tagName',function(ctx,name,exp){ }); //tagName 是自定义标签名称，用时要加上前缀，如定义'test'标签，用时h-test="" 
 ```
 用法
 ```html
@@ -257,9 +257,10 @@ each遍历标签
 参数
 -----------
 
-|Name 	Type 	 	Description
+|Name |	Type |	 	Description|
 |-----------|-----------|-----------|
 |ctx 	|Context 	|	上下文，一般会用到 ctx.options、渲染表达式函数：ctx.compile(exp)和模板渲染函数：ctx.tpl(exp)|
+|name |string 	|	标签名称|
 |exp 	|string 	|	标签值|
 
 字符串拼接运算
