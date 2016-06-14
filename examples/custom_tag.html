@@ -20,7 +20,8 @@
 <!--去掉下面两个js可以预览静态效果-->
 <script src="../domTemplate.js"></script>
 <script type="text/javascript">
-    $.domTemplate.registerTag('prefix',function(ctx,exp){
+    $.domTemplate.registerTag('prefix',function(ctx,name,exp){
+        debugger;
         var result=ctx.compile(exp);
         ctx.options.$currentElement.text(ctx.options.data.basePrefix+result);
     });

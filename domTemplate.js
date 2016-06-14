@@ -162,6 +162,7 @@
             code += 'return r.join("");';
             //console.info(code.replace(/[\r\t\n]/g, ''));
             //console.info(code);
+
             return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
         };
         /**
@@ -183,6 +184,7 @@
             }
             functionBody += "return " + template.substr(0, template.length - 1).substr(1) + ";";
             //console.info(functionBody);
+            debugger;
             return new Function(functionBody).apply(options);
         };
 

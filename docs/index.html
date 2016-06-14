@@ -544,12 +544,12 @@
                 <p> <a target="_blank" href="../examples/each_array.html">遍历数组例子</a></p>
                 <p> <a target="_blank" href="../examples/each_nest_list.html">遍历嵌套list例子</a></p>
 
-                <h2 id="js-h-custom-tag">自定义标签标签</h2>
+                <h2 id="js-h-custom-tag">自定义标签</h2>
                 <p></p>
                 <div class="highlight">
                     <pre class="prettyprint"><code class="language-js" data-lang="js">
 
-                        $.domTemplate.registerTag('tagName',function(ctx,exp){
+                        $.domTemplate.registerTag('tagName',function(ctx,name,exp){
                         });
                         //tagName 是自定义标签名称，用时要加上前缀，如定义'test'标签，用时h-test=""
                     </code></pre>
@@ -578,6 +578,12 @@
                             <td>Context</td>
                             <td></td>
                             <td>上下文，一般会用到 <a href="#js-ctx-options">ctx.options</a>、渲染表达式函数：<code>ctx.compile(exp)</code>和模板渲染函数：<code>ctx.tpl(exp)</code></td></td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>string</td>
+                            <td></td>
+                            <td>标签名称</td>
                         </tr>
                         <tr>
                             <td>exp</td>
