@@ -184,7 +184,6 @@
             }
             functionBody += "return " + template.substr(0, template.length - 1).substr(1) + ";";
             //console.info(functionBody);
-            debugger;
             return new Function(functionBody).apply(options);
         };
 
