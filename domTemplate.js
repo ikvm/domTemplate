@@ -8,6 +8,11 @@
 
     "use strict";
 
+    var DomTemplate = function () {
+    };
+
+    $.domTemplate = DomTemplate;
+
     /**
      * 渲染数据上下文
      * @param options
@@ -34,7 +39,6 @@
         this.options.prefixLength = this.options.prefix.length;
         this.options.$parentElement = this.options.$parentElement || $(this.options.selector);
         this.options.$currentElement = this.options.$currentElement || this.options.$parentElement;
-        this.tagCacheMap = {};
     };
 
     Context.prototype = {
@@ -130,7 +134,7 @@
         var addCode = function (line, isJs) {
 
             isJs ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
-                (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
+                (code += line !== '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
             return addCode;
         };
 
@@ -202,7 +206,7 @@
     }
 
     function toJson(str) {
-        return eval('(' + str + ')');
+        return (new Function("","return "+str))();
     }
 
     /**
@@ -228,7 +232,7 @@
             var me = this;
             callback = callback || me.callback;
 
-            var _async = typeof callback == "function" ? true : false;
+            var _async = typeof callback === "function" ? true : false;
             var _resultData;
             $.ajax({
                 type: me.type,
@@ -346,11 +350,6 @@
         }
     };
 
-    var DomTemplate = function () {
-    };
-
-    $.domTemplate = DomTemplate;
-
     $.domTemplate.newContext = function (options) {
         return new Context(options);
     }
@@ -466,7 +465,6 @@
                 return [new Model({name: 'root', modelEl: $modelItem, parentCtx: ctx})];
             }
             var modelParams = toJson(template);
-
             var models = [], _model, preModel;
             for (var modelName in modelParams) {
                 _model = new Model({name: modelName, modelEl: $modelItem, parentCtx: ctx});
@@ -488,7 +486,7 @@
                 var models = me.modelParser(ctx, $modelItem);
                 var firstModel = models[0];
                 parentModel.addChild(firstModel);
-                var lastModel = models.length == 1 ? firstModel : models[models.length - 1];
+                var lastModel = models.length === 1 ? firstModel : models[models.length - 1];
                 me.modelTreeParser(ctx, lastModel, $modelItem);
                 _domTemplate.fn.setModels(models);
 
@@ -502,7 +500,7 @@
 
             var rootModels = me.modelParser(ctx, $rootItem);
             var rootModel = rootModels[0];
-            var lastModel = rootModels.length == 1 ? rootModel : rootModels[rootModels.length - 1];
+            var lastModel = rootModels.length === 1 ? rootModel : rootModels[rootModels.length - 1];
             me.modelTreeParser(ctx, lastModel, $rootItem);
             _domTemplate.fn.setRootModel(rootModel);
             this.render(rootModel);
@@ -604,7 +602,7 @@
                 $appendEl.removeAttr(this.lastItemIdKey);
                 $appendEl.removeAttr(this.itemKey);
 
-                if (ctx.modelCtx.options.appendType == 'before') {//下拉刷新
+                if (ctx.modelCtx.options.appendType === 'before') {//下拉刷新
                     $firstItemEl.before($appendEl);
 
                     $firstItemEl.removeAttr(tagName);
@@ -651,7 +649,7 @@
             if (!object) {
                 return;
             }
-            if (ctx.options.appendType != 'before' && ctx.options.appendType != 'after') {//分页方式加载
+            if (ctx.options.appendType !== 'before' && ctx.options.appendType !== 'after') {//分页方式加载
                 this.clean(ctx, $firstItemEl);
             }
             var $lastItemEl = null;
@@ -774,11 +772,11 @@
                 });
             },
             render: function (ctx, name, exp) {
-                if (name == this.name) {
+                if (name === this.name) {
                     var attrs = exp.split(",");
                     for (var i = 0; i < attrs.length; i++) {
                         var pairs = attrs[i].split("=");
-                        if (pairs.length == 2) {
+                        if (pairs.length === 2) {
                             this.renderAttr(ctx, DomTemplate.trim(pairs[0]), pairs[1]);
                         }
                     }
@@ -794,7 +792,6 @@
                 ctx.currentElTagAttr(name, result);
             }
         },
-
         'if': {
             name: 'if',
             render: function (ctx, name, exp) {
