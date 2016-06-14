@@ -8,13 +8,13 @@
 <body>
 
 <p>遍历map例子</p>
-<ul h-each="item : {users}">
-    <li h-text="{item.key}:{item.value}">李小璐</li>
+<ul>
+    <li h-each="item : {users}" h-text="{item.key}:{item.value}">李小璐</li>
 </ul>
 
 <p>遍历map例子2</p>
-<ul h-each="item : {{name:'lala',age:25}}">
-    <li h-text="{item.key}:{item.value}">李小璐</li>
+<ul>
+    <li  h-each="item : {{name:'lala',age:25}}" h-text="{item.key}:{item.value}">李小璐</li>
 </ul>
 
 

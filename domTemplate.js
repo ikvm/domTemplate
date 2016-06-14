@@ -14,6 +14,78 @@
     $.domTemplate = DomTemplate;
 
     /**
+     * 模板执行引擎
+     * @param template
+     * @constructor
+     */
+    var TemplateEngine = function (template) {
+        var t = this;
+        t.template = template;
+        var codeExp = /\{([^}>]+)?}/g, reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];', match, cursor = 0;
+
+        var addCode = function (line, isJs) {
+
+            isJs ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
+                (code += line !== '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
+            return addCode;
+        };
+
+        /**
+         * 编译模板
+         * @param template
+         * @param options
+         * @returns string
+         */
+        function tpl(template, options) {
+
+            template = template || t.template;
+            if (typeof template !== 'string') {
+                throw new Error('Template must be a string');
+            }
+
+            for (var name in options) {
+                code += 'var ' + name + '=this.' + name + ';';
+            }
+            while (match = codeExp.exec(template)) {
+                addCode(template.slice(cursor, match.index))(match[1], true);
+                cursor = match.index + match[0].length;
+            }
+            addCode(template.substr(cursor, template.length - cursor));
+            code += 'return r.join("");';
+
+            return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
+        };
+
+        /**
+         * 编译表达式
+         * @param template
+         * @param options
+         * @returns {*}
+         */
+        function compile(template, options) {
+
+            template = template || t.template;
+            if (typeof template !== 'string') {
+                throw new Error('Template must be a string');
+            }
+            var functionBody = ""
+            template = DomTemplate.trim(template);
+            for (var name in options) {
+                functionBody += 'var ' + name + '=this.' + name + ';';
+            }
+            functionBody += "return " + template.substr(0, template.length - 1).substr(1) + ";";
+            return new Function(functionBody).apply(options);
+        };
+
+        t.tpl = function (template, options) {
+            return tpl(template, options);
+        };
+        t.compile = function (template, options) {
+            return compile(template, options);
+        };
+    };
+
+    /**
      * 渲染数据上下文
      * @param options
      * @param ctx
@@ -121,79 +193,6 @@
 
     };
 
-    /**
-     * 模板执行引擎
-     * @param template
-     * @constructor
-     */
-    var TemplateEngine = function (template) {
-        var t = this;
-        t.template = template;
-        var codeExp = /\{([^}>]+)?}/g, reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];', match, cursor = 0;
-
-        var addCode = function (line, isJs) {
-
-            isJs ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
-                (code += line !== '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
-            return addCode;
-        };
-
-        /**
-         * 编译模板
-         * @param template
-         * @param options
-         * @returns string
-         */
-        function tpl(template, options) {
-
-            template = template || t.template;
-            if (typeof template !== 'string') {
-                throw new Error('Template must be a string');
-            }
-
-            for (var name in options) {
-                code += 'var ' + name + '=this.' + name + ';';
-            }
-            while (match = codeExp.exec(template)) {
-                addCode(template.slice(cursor, match.index))(match[1], true);
-                cursor = match.index + match[0].length;
-            }
-            addCode(template.substr(cursor, template.length - cursor));
-            code += 'return r.join("");';
-            //console.info(code.replace(/[\r\t\n]/g, ''));
-            //console.info(code);
-
-            return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
-        };
-        /**
-         * 编译表达式
-         * @param template
-         * @param options
-         * @returns {*}
-         */
-        function compile(template, options) {
-
-            template = template || t.template;
-            if (typeof template !== 'string') {
-                throw new Error('Template must be a string');
-            }
-            var functionBody = ""
-            template = DomTemplate.trim(template);
-            for (var name in options) {
-                functionBody += 'var ' + name + '=this.' + name + ';';
-            }
-            functionBody += "return " + template.substr(0, template.length - 1).substr(1) + ";";
-            //console.info(functionBody);
-            return new Function(functionBody).apply(options);
-        };
-
-        t.tpl = function (template, options) {
-            return tpl(template, options);
-        };
-        t.compile = function (template, options) {
-            return compile(template, options);
-        };
-    };
 
     function isEmptyObject(obj) {
         for (var name in obj) {
@@ -326,7 +325,6 @@
         },
         execute: function () {
             if (!this.options.parsed) {
-                //console.info("processing model :" + this.options.name);
                 this.options.parsed = true;
 
                 this.options.ctx = this.options.ctx ? new Context(this.options.ctx.options, this.options.parentCtx)
@@ -378,7 +376,7 @@
             var tagsNames = $item.attr(this.doneTagsKey);
             tagsNames = tagsNames || '';
             tagName += '|';
-            if (tagsNames.indexOf(tagName) == -1) {
+            if (tagsNames.indexOf(tagName) < 0) {
                 tagsNames += tagName;
                 $item.attr(this.doneTagsKey, tagsNames);
                 return true;
@@ -421,7 +419,7 @@
         return "dt_" + _domTemplate.fn.idIndex++;
     };
     //HTML转义
-    DomTemplate.encodeHTML = function encodeHTML(source) {
+    DomTemplate.encodeHTML = function (source) {
         return String(source)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -518,7 +516,6 @@
             return ctx.options.prefix + this.name;
         },
         execute: function (ctx, $rootItem) {
-            var me = this;
             var tagName = this.tagName(ctx);
             var $items = $rootItem.find('[' + tagName + ']');
             $items.each(function (index, item) {
@@ -542,7 +539,6 @@
         },
         isEachChunk: function ($el) {//含有itemKey的属性的，表示each循环的模板，each模板只在each标签逻辑中执行一次
             return $el.closest(this.itemKeyAttr).length > 0;
-
         },
         execute: function (ctx) {
             var me = this;
@@ -755,7 +751,7 @@
                 $.each(item.attributes, function (i, attr) {
                     ctx.options.$currentElement = $(item);
 
-                    if (attr.name.indexOf(ctx.options.prefix) == 0) {
+                    if (attr.name.indexOf(ctx.options.prefix) === 0) {
                         name = attr.name.substr(ctx.options.prefixLength);
                         value = attr.value;
                         isEachChunk = _domTemplate.fn.eachTag.isEachChunk(ctx.options.$currentElement);

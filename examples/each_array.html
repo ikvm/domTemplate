@@ -8,13 +8,13 @@
 <body>
 
 <p>遍历数组例子</p>
-<ul h-each="item : {users}">
-    <li h-text="{itemStat.index}:{item}">李小璐</li>
+<ul>
+    <li h-each="item : {users}" h-text="{itemStat.index}:{item}">李小璐</li>
 </ul>
 
 <p>遍历数组例子2</p>
-<ul h-each="item : {['lala','lulu']}">
-    <li h-text="{itemStat.index}:{item}">李小璐</li>
+<ul>
+    <li  h-each="item : {['lala','lulu']}" h-text="{itemStat.index}:{item}">李小璐</li>
 </ul>
 
 
