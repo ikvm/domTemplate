@@ -257,10 +257,10 @@ each遍历标签
 参数
 -----------
 
-|Name 	Type 	 	Description
+|Name |	Type |	 	Description|
 |-----------|-----------|-----------|
 |ctx 	|Context 	|	上下文，一般会用到 ctx.options、渲染表达式函数：ctx.compile(exp)和模板渲染函数：ctx.tpl(exp)|
-|name 	|string 	|	标签名称|
+|name |string 	|	标签名称|
 |exp 	|string 	|	标签值|
 
 字符串拼接运算
