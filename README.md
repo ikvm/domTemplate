@@ -219,28 +219,28 @@ each遍历标签
 
 ```html
  <p>遍历List例子</p> 
- <ul h-each="user,userStat : {users}"> 
- <li h-text="{userStat.index+1}---{user.email}">李小璐</li> 
+ <ul> 
+ <li h-each="user,userStat : {users}" h-text="{userStat.index+1}---{user.email}">李小璐</li> 
  </ul> 
 
  <p>遍历map例子</p> 
- <ul h-each="item : {user}"> 
- <li h-text="{item.key}:{item.value}">李小璐</li> 
+ <ul> 
+ <li  h-each="item : {user}" h-text="{item.key}:{item.value}">李小璐</li> 
  </ul> 
 
  <p>遍历map例子2</p> 
- <ul h-each="item : {{name:'lala',age:25}}"> 
- <li h-text="{item.key}:{item.value}">李小璐</li> 
+ <ul> 
+ <li h-each="item : {{name:'lala',age:25}}" h-text="{item.key}:{item.value}">李小璐</li> 
  </ul> 
 
  <p>遍历数组例子</p> 
- <ul h-each="item : {users}"> 
- <li h-text="{itemStat.index}:{item}">李小璐</li>> 
+ <ul> 
+ <li h-each="item : {users}" h-text="{itemStat.index}:{item}">李小璐</li>> 
  </ul> 
 
  <p>遍历数组例子2</p> 
- <ul h-each="item : {['lala','lulu']}"> 
- <li h-text="{itemStat.index}:{item}">李小璐</li> 
+ <ul> 
+ <li h-each="item : {['lala','lulu']}" h-text="{itemStat.index}:{item}">李小璐</li> 
  </ul> 
 ```
 渲染结果详细看例子
