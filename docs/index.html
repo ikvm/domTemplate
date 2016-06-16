@@ -495,43 +495,43 @@
                     <pre class="prettyprint"><code class="language-html" data-lang="html">
                         &lt;p&gt;遍历List例子&lt;/p&gt;
                         <br/>
-                        &lt;ul h-each="user,userStat : {users}"&gt;
+                        &lt;ul&gt;
                         <br/>
-                        &lt;li h-text="{userStat.index+1}---{user.email}"&gt;李小璐&lt;/li&gt;
+                        &lt;li  h-each="user,userStat : {users}" h-text="{userStat.index+1}---{user.email}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
 
                         <p/>
                         &lt;p&gt;遍历map例子&lt;/p&gt;
                         <br/>
-                        &lt;ul h-each="item : {user}"&gt;
+                        &lt;ul&gt;
                         <br/>
-                        &lt;li h-text="{item.key}:{item.value}"&gt;李小璐&lt;/li&gt;
+                        &lt;li h-each="item : {user}" h-text="{item.key}:{item.value}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
                         <p/>
                         &lt;p&gt;遍历map例子2&lt;/p&gt;
                         <br/>
-                        &lt;ul h-each="item : {{name:'lala',age:25}}"&gt;
+                        &lt;ul&gt;
                         <br/>
-                        &lt;li h-text="{item.key}:{item.value}"&gt;李小璐&lt;/li&gt;
+                        &lt;li  h-each="item : {{name:'lala',age:25}}" h-text="{item.key}:{item.value}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
 
                         <p/>
                         &lt;p&gt;遍历数组例子&lt;/p&gt;
                         <br/>
-                        &lt;ul h-each="item : {users}"&gt;
+                        &lt;ul&gt;
                         <br/>
-                        &lt;li h-text="{itemStat.index}:{item}"&gt;李小璐&lt;/li>&gt;
+                        &lt;li h-each="item : {users}" h-text="{itemStat.index}:{item}"&gt;李小璐&lt;/li>&gt;
                         <br/>
                         &lt;/ul&gt;
                         <p/>
                         &lt;p&gt;遍历数组例子2&lt;/p&gt;
                         <br/>
-                        &lt;ul h-each="item : {['lala','lulu']}"&gt;
+                        &lt;ul&gt;
                         <br/>
-                        &lt;li h-text="{itemStat.index}:{item}"&gt;李小璐&lt;/li&gt;
+                        &lt;li  h-each="item : {['lala','lulu']}" h-text="{itemStat.index}:{item}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
 
