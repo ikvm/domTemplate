@@ -1,4 +1,4 @@
-# domTemplate
+# domTemplate.js
 一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端模板引擎。彻底实现前后端分离，让后端专注业务的处理。
 ####Demo http://parky18.github.io/demo/
 
@@ -30,9 +30,9 @@
 2、动态效果和静态效果分别存在不同文件，美工和后端工程师需要分别维护各自页面文件，其中一方需要修改页面，都需要通知另一方进行修改  
 3、页面数据不能分块加载、获取跨域数据比较麻烦  
 
-domTemplate 模板引擎是通过在标签中添加自定义属性，实现动态模板功能，当没有引入domTemplate脚本， 则自定义标签属性不会被浏览器解析，不会破坏原有静态效果，当引入domTemplate脚本，模板引擎回去解析这些标签属性， 并加载数据进行动态渲染。 下图：对比服务器页面渲染和使用domTemplate前端引擎开发流程 
+domTemplate.js 模板引擎是通过在标签中添加自定义属性，实现动态模板功能，当没有引入domTemplate脚本， 则自定义标签属性不会被浏览器解析，不会破坏原有静态效果，当引入domTemplate脚本，模板引擎回去解析这些标签属性， 并加载数据进行动态渲染。 下图：对比服务器页面渲染和使用domTemplate前端引擎开发流程 
 
-| 服务器端模板解析 | domTemplate前端解析 |
+| 服务器端模板解析 | domTemplate.js前端解析 |
 | ---- | ---- |
 |![before](https://github.com/parky18/domTemplate/blob/master/docs/images/before.jpg)|![after](https://github.com/parky18/domTemplate/blob/master/docs/images/after.jpg)|
 用法
