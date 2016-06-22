@@ -210,35 +210,31 @@
     }
 
     /**
-     * model ajax 请求参数对象
+     * model 数据请求对象
      * @param ctx
      * @param model
      * @param name
-     * @param params
+     * @param options
      * @constructor
      */
-    var AjaxParam = function (ctx, model, name, params) {
+    var DataLoader = function (ctx, model, name, options) {
         this.ctx = ctx || {};
         this.model = model;
+        this.options=options;
         this.name = name || '';
-        this.url = params.url;
-        this.type = params.type || 'post';
-        this.data = params.data || {};
-        this.dataType = params.dataType || 'json';
     };
 
-    AjaxParam.prototype = {
+    DataLoader.prototype = {
         load: function (callback) {
             var me = this;
             callback = callback || me.callback;
 
             var _async = typeof callback === "function" ? true : false;
             var _resultData;
-            $.ajax({
-                type: me.type,
-                url: me.url,
-                data: me.data,
-                dataType: me.dataType,
+            var ajaxParams= $.extend({
+                type: 'post',
+                data: {},
+                dataType: 'json',
                 async: _async,
                 success: function (res) {
                     me.ctx.options.data[me.name] = res;
@@ -248,7 +244,9 @@
                     console.error(status + ":" + orr);
                 }
 
-            });
+            },me.options);
+
+            $.ajax(ajaxParams);
             if (!_async) {
                 return _resultData;
             }
@@ -271,11 +269,11 @@
 
     Model.prototype = {
         setParams: function (options) {
-            $.extend(this.options.params, options);
+            $.extend(this.options.dataLoader.options, options);
             return this;
         },
         setParamsData: function (data) {
-            this.options.params.data = data;
+            this.options.dataLoader.options.data = data;
             return this;
         },
         childrenSize: function () {
@@ -299,9 +297,9 @@
         },
         load: function () {
             var childrenSize = this.childrenSize();
-            if (this.options.params) {
-                this.options.params.callback = childrenSize == 0 ? this.callback : null;
-                this.options.params.load();
+            if (this.options.dataLoader) {
+                this.options.dataLoader.callback = childrenSize == 0 ? this.callback : null;
+                this.options.dataLoader.load();
 
                 for (var i = 0; i < childrenSize; i++) {
                     this.options.children[i].load(this.callback);
@@ -467,8 +465,8 @@
             var models = [], _model, preModel;
             for (var modelName in modelParams) {
                 _model = new Model({name: modelName, modelEl: $modelItem, parentCtx: ctx});
-                var param = new AjaxParam(ctx, _model, modelName, modelParams[modelName]);
-                _model.options.params = param;
+                var dataLoader = new DataLoader(ctx, _model, modelName, modelParams[modelName]);
+                _model.options.dataLoader = dataLoader;
                 models.push(_model);
                 if (preModel) {
                     preModel.addChild(_model)
