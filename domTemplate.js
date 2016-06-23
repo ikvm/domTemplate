@@ -14,78 +14,6 @@
     $.domTemplate = DomTemplate;
 
     /**
-     * 模板执行引擎
-     * @param template
-     * @constructor
-     */
-    var TemplateEngine = function (template) {
-        var t = this;
-        t.template = template;
-        var codeExp = /\{([^}>]+)?}/g, reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];', match, cursor = 0;
-
-        var addCode = function (line, isJs) {
-
-            isJs ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
-                (code += line !== '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
-            return addCode;
-        };
-
-        /**
-         * 编译模板
-         * @param template
-         * @param options
-         * @returns string
-         */
-        function tpl(template, options) {
-
-            template = template || t.template;
-            if (typeof template !== 'string') {
-                throw new Error('Template must be a string');
-            }
-
-            for (var name in options) {
-                code += 'var ' + name + '=this.' + name + ';';
-            }
-            while (match = codeExp.exec(template)) {
-                addCode(template.slice(cursor, match.index))(match[1], true);
-                cursor = match.index + match[0].length;
-            }
-            addCode(template.substr(cursor, template.length - cursor));
-            code += 'return r.join("");';
-
-            return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
-        };
-
-        /**
-         * 编译表达式
-         * @param template
-         * @param options
-         * @returns {*}
-         */
-        function compile(template, options) {
-
-            template = template || t.template;
-            if (typeof template !== 'string') {
-                throw new Error('Template must be a string');
-            }
-            var functionBody = ""
-            template = DomTemplate.trim(template);
-            for (var name in options) {
-                functionBody += 'var ' + name + '=this.' + name + ';';
-            }
-            functionBody += "return " + template.substr(0, template.length - 1).substr(1) + ";";
-            return new Function(functionBody).apply(options);
-        };
-
-        t.tpl = function (template, options) {
-            return tpl(template, options);
-        };
-        t.compile = function (template, options) {
-            return compile(template, options);
-        };
-    };
-
-    /**
      * 渲染数据上下文
      * @param options
      * @param ctx
@@ -132,19 +60,10 @@
             return value;
         },
         tpl: function (exp) {
-            var t = new TemplateEngine();
-            var options = $.extend({}, this.options.data, _domTemplate.fn.helpers);
-            var result = t.tpl(exp, options);
-            if (this.options.escape) {
-                return DomTemplate.encodeHTML(result)
-            } else {
-                return result;
-            }
+            return $.domTemplate.template.tpl(exp, this.options.data,this.options.escape);
         },
         compile: function (exp) {
-            var t = new TemplateEngine();
-            var options = $.extend({}, this.options.data, _domTemplate.fn.helpers);
-            return t.compile(exp, options);
+            return  $.domTemplate.template.compile(exp,  this.options.data);
         },
         find: function (selector) {//查找子类和自身
             var $el = this.options.$parentElement;
@@ -360,7 +279,6 @@
         supportAttrs: ['text', 'val', 'html', 'href', 'src', 'class', 'css', 'width', 'height', 'name', 'id', 'title', 'alt'],
         rootModel: {},
         models: {},
-        helpers: {},
 
         init: function (options) {
             var ctx = new Context(options);
@@ -840,24 +758,6 @@
     DomTemplate.unregisterTag = function (name) {
         _domTemplate.fn.tags[name] = undefined;
         delete _domTemplate.fn.tags[name];
-    };
-
-    /**
-     * 注册自定义函数
-     * @param name 函数名称
-     * @param fn 处理逻辑
-     */
-    DomTemplate.registerHelper = function (name, fn) {
-        _domTemplate.fn.helpers[name] = fn;
-    };
-
-    /**
-     * 删除自定义函数
-     * @param name
-     */
-    DomTemplate.unregisterHelper = function (name) {
-        _domTemplate.fn.helpers[name] = undefined;
-        delete _domTemplate.fn.helpers[name];
     };
 
     /**

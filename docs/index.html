@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端引擎">
+    <meta name="description" content="一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端HTML模板解析引擎">
     <meta name="author" content="">
 
     <title>
@@ -34,7 +34,7 @@
 <div class="docs-header" id="content" tabindex="-1">
     <div class="container">
         <h1>domTemplate</h1>
-        <p>一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端引擎</p>
+        <p>一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端HTML模板解析引擎</p>
     </div>
 </div>
 
@@ -46,7 +46,7 @@
 
                 <h2 id="js-h-over">概述</h2>
                 <p>
-                    这是一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端引擎。
+                    这是一个非侵入式、不会破坏原来静态页面结构、可被浏览器正确显示的、格式良好的前端HTML模板解析引擎。
                 </p>
 
                 <p>
@@ -74,7 +74,7 @@
 
                 <h2 id="js-h-user">用法</h2>
                 <p>
-                    导入<code>jquery.js</code>或者<code>zepto.js</code>和<code>domTemplate.js</code>
+                    导入<code>jquery.js</code>或者<code>zepto.js</code>和<code>domTemplate.min.js</code>
                     <a target="_blank" href="../examples/render_all.html">示例</a>
                 </p>
                 <div class="highlight">
@@ -348,7 +348,7 @@
                     <pre class="prettyprint"><code class="language-html" data-lang="html">&lt;a class='uType' href='http://www.baidu.com/20.jpg' h-class="{user.type}" h-href="{user.pic}" h-text="{user.username}"&gt;李华明&lt;/a&gt;</code></pre>
                 </div>
                 <p>
-                    如果还需要支持其他标签，可以通过<code>$.domTemplate.registerSupportAttr(attrName)</code>进行添加。
+                    如果还需要支持其他标签属性，可以通过<code>$.domTemplate.registerSupportAttr(attrName)</code>进行添加。
                 </p>
 
                 <h2 id="js-h-html">html标签</h2>
@@ -497,7 +497,7 @@
                         <br/>
                         &lt;ul&gt;
                         <br/>
-                        &lt;li  h-each="user,userStat : {users}" h-text="{userStat.index+1}---{user.email}"&gt;李小璐&lt;/li&gt;
+                        &lt;li h-each="user,userStat : {users}" h-text="{userStat.index+1}---{user.email}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
 
@@ -514,7 +514,7 @@
                         <br/>
                         &lt;ul&gt;
                         <br/>
-                        &lt;li  h-each="item : {{name:'lala',age:25}}" h-text="{item.key}:{item.value}"&gt;李小璐&lt;/li&gt;
+                        &lt;li h-each="item : {{name:'lala',age:25}}" h-text="{item.key}:{item.value}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
 
@@ -531,7 +531,7 @@
                         <br/>
                         &lt;ul&gt;
                         <br/>
-                        &lt;li  h-each="item : {['lala','lulu']}" h-text="{itemStat.index}:{item}"&gt;李小璐&lt;/li&gt;
+                        &lt;li h-each="item : {['lala','lulu']}" h-text="{itemStat.index}:{item}"&gt;李小璐&lt;/li&gt;
                         <br/>
                         &lt;/ul&gt;
 

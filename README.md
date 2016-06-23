@@ -37,7 +37,7 @@ domTemplate.js 模板引擎是通过在标签中添加自定义属性，实现�
 |![before](https://github.com/parky18/domTemplate/blob/master/docs/images/before.jpg)|![after](https://github.com/parky18/domTemplate/blob/master/docs/images/after.jpg)|
 用法
 -----------
-导入`jquery.js`或者`zepto.js`和`domTemplate.js`
+导入`jquery.js`或者`zepto.js`和`domTemplate.min.js`
 ```javascript
 $(function () {
  $.domTemplate.init(options);//可以通过selector指定根节点，默认根节点是body,表示从body开始，渲染整个页面 
