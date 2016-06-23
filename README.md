@@ -126,7 +126,7 @@ model数据:
 |title |	h-title|
 |alt |	h-alt|
 
-如果还需要支持其他标签，可以通过`$.domTemplate.registerSupportAttr(attrName)`进行添加。 
+如果还需要支持其他标签属性，可以通过`$.domTemplate.registerSupportAttr(attrName)`进行添加。 
 
 html标签
 -----------
