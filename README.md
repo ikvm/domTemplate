@@ -34,7 +34,7 @@ domTemplate.js 模板引擎是通过在标签中添加自定义属性，实现�
 
 | 服务器端模板解析 | domTemplate.js前端解析 |
 | ---- | ---- |
-|![before](https://github.com/parky18/domTemplate/blob/master/docs/images/before.jpg)|![after](https://github.com/parky18/domTemplate/blob/master/docs/images/after.jpg)|
+|![before](http://git.oschina.net/parki/domTemplate/raw/master/docs/images/before.jpg)|![after](http://git.oschina.net/parki/domTemplate/raw/master/docs/images/after.jpg)|
 用法
 -----------
 导入`jquery.js`或者`zepto.js`和`domTemplate.min.js`
@@ -61,12 +61,54 @@ $(function () {
 
 model标签
 -----------
-模板引擎通过`<h-model>`标签获取渲染数据  
+模板引擎通过`<h-model>`标签获取渲染数据,并把数据放到上下文`Context`中
+方式1(把h-model取数据放在任意标签):
   ```html
-    <body h-model="{user:{url:'http://localhost:8080/v/game/getUser'}}"></body>
-    或者
-    <div h-model="{user:{url:'http://localhost:8080/v/game/getUser'}}"></div>
+ <body h-model="{user:{url:'http://localhost:8080/v/game/getUser'}}">< 
+ <a h-class="{user.type}" h-href="{user.pic}" h-text="{user.username}">xxx1</a> 
+ /body>
   ```
+ 方式2(把h-model取数据放在任意标签,可以连续取多个Model数据):
+  ```html
+ <div h-model="{user:{url:'http://localhost:8080/v/game/getUser'},users:{type:'get',url:'http://localhost:8080/v/game/getUsers'}}"> 
+ <a h-class="{user.type}" h-href="{user.pic}" h-text="{user.username}">xxx1</a> 
+ </div> 
+   ```
+ 方式3(把h-model取数据放在任意标签,不同块数据相互不影响):
+  ```html
+ <div h-model="{user1:{url:'http://localhost:8080/v/game/getUser?id=5'}}"> 
+ <a h-class="{user1.type}" h-href="{user1.pic}" h-text="{user1.username}">xxx1</a> 
+ </div> 
+ <div h-model="{user2:{url:'http://localhost:8080/v/game/getUser?id=6'}}"> 
+ <a h-class="{user2.type}" h-href="{user2.pic}" h-text="{user2.username}">xxx1</a> 
+ </div> 
+   ```
+方式4(h-model标签可以嵌套使用):
+ ```html
+ <body> 
+ <div class="container"> 
+ <div class="table-responsive" h-model="{data:{url:'http://api.huceo.com/txapi/chengyu/?key=0e70bfd01018c4404e24e68c73255d81&word=%E9%A9%AC%E5%88%B0%E6%88%90%E5%8A%9F'}}"> 
+ <h3 h-text="{data.newslist[0].chengyu}">成语 <p>出处:<span h-text="{data.newslist[0].diangu}"></span></p> 
+ <p>拼音:<span h-text="{data.newslist[0].pinyin}"></span></p> 
+ <p>出处:<span h-text="{data.newslist[0].chuchu}"></span></p> 
+ <p>范例:<span h-text="{data.newslist[0].fanli}"></span></p> 
+ <div h-model="{data2:{url:'http://api.huceo.com/txapi/chengyu/?key=0e70bfd01018c4404e24e68c73255d81&word=%E6%97%97%E5%BC%80%E5%BE%97%E8%83%9C'}}"> 
+ <h4 h-text="[{data.newslist[0].chengyu}]相关同义词:{data2.newslist[0].chengyu}">成语</h4> 
+ <p>出处:<span h-text="{data2.newslist[0].diangu}"></span></p> 
+ <p>拼音:<span h-text="{data2.newslist[0].pinyin}"></span></p> 
+ <p>出处:<span h-text="{data2.newslist[0].chuchu}"></span></p> 
+ <p>范例:<span h-text="{data2.newslist[0].fanli}"></span></p> 
+ </div> 
+ </div> 
+ </div> 
+ </body> 
+ ```
+model标签作用域
+只有model标签的子节点才能获得model数据，不同块model数据相互独立不影响，但是单个页面model名称还是建议不要相同
+
+[model标签测试例子](http://parky18.github.io/demo/examples/test_model.html)  
+[嵌套model测试例子](http://parky18.github.io/demo/examples/test_nest_model.html)  
+
 model请求参数
 --------
 
@@ -93,6 +135,11 @@ $.domTemplate.getModel('list1').setParamsData({page: page}).reload({appendType: 
 console.info("加载完成") ;
 }); 
 ```
+
+[刷新model例子1](http://parky18.github.io/demo/examples/reload_model.html)
+[刷新model例子2](http://parky18.github.io/demo/examples/reload_model2.html)
+[刷新model例子3](http://parky18.github.io/demo/examples/reload_model3.html)
+
 属性标签
 -----------
 可以把多个DOM标签用逗号分隔，解析后会把对应的标签属性替换
@@ -107,6 +154,8 @@ model数据:
  <img src="http://www.wed114.cn/jiehun/uploads/allimg/160426/39_160426110624_1.jpg" 
  title='测试标题' alt='测试标题' h-attr="src={img.src},title={img.title},alt={img.title}" /> 
 ```
+[attr标签例子](http://parky18.github.io/demo/examples/attr.html)
+
 其他属性标签
 -----------
 引擎除了支持`h-attr`这种方式：还支持以下替换标签写法
@@ -244,6 +293,10 @@ each遍历标签
  </ul> 
 ```
 渲染结果详细看例子
+[遍历list例子](http://parky18.github.io/demo/examples/each_list.html)
+[遍历map例子](http://parky18.github.io/demo/examples/each_map.html)
+[遍历数组例子](http://parky18.github.io/demo/examples/each_array.html)
+[遍历嵌套list例子](http://parky18.github.io/demo/examples/each_nest_list.html)
 
 自定义标签
 -----------
@@ -254,7 +307,7 @@ each遍历标签
 ```html
  <input type="text" h-tagName="{user.username}" /> 
 ```
-
+[自定义标签例子](http://parky18.github.io/demo/examples/custom_tag.html)
 参数
 -----------
 
@@ -305,3 +358,8 @@ each遍历标签
 ```html
  <p h-text="{toPrefix(user.email}">test:parky_18@163.com</p> 
 ```
+[自定义函数例子](http://parky18.github.io/demo/examples/custom_function.html)
+
+其他例子
+-----------
+[新闻APP](http://parky18.github.io/demo/examples/news.html)
