@@ -365,5 +365,5 @@ each遍历标签
 
 其他例子
 -----------
-[新闻APP](http://parky18.github.io/demo/examples/news.html)
+[新闻APP](http://parky18.github.io/demo/examples/news.html)  
 [图片懒加载和渲染成功回调例子](http://parky18.github.io/demo/examples/images_lazyload.html)
