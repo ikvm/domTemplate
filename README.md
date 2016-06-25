@@ -40,12 +40,12 @@ domTemplate.js 模板引擎是通过在标签中添加自定义属性，实现�
 导入`jquery.js`或者`zepto.js`和`domTemplate.min.js`
 ```javascript
 $(function () {
- $.domTemplate.init(options);//可以通过selector指定根节点，默认根节点是body,表示从body开始，渲染整个页面 
+ $.domTemplate.init(options,callback);//可以通过selector指定根节点，默认根节点是body,表示从body开始，渲染整个页面 
  }); 
  ```
  或者解析某一个html片段。
  ```javascript
-  $('selector').domTemplate(options);//渲染数据是通过h-model 自动去获取数据，也可以通过data指定全局数据 
+  $('selector').domTemplate(options,callback);//渲染数据是通过h-model 自动去获取数据，也可以通过data指定全局数据 
   ```
   Options
 --------
@@ -59,6 +59,9 @@ $(function () {
 | $parentElement |	jquery或者zepto对象 |	$(selector) |	当前上下文渲染父元素| 
 | $currentElement |	jquery或者zepto对象 |	$parentElement 	| 当前上下文渲染元素| 
 
+  callback
+--------
+模板渲染成功回调函数,`callback(model)`,所有需要等页面渲染成为做的逻辑需要注册这个回调函数，例如用`jquery.lazyload.js`实现图片懒加载
 model标签
 -----------
 模板引擎通过`<h-model>`标签获取渲染数据,并把数据放到上下文`Context`中
@@ -363,3 +366,4 @@ each遍历标签
 其他例子
 -----------
 [新闻APP](http://parky18.github.io/demo/examples/news.html)
+[图片懒加载和渲染成功回调例子](http://parky18.github.io/demo/examples/images_lazyload.html)
