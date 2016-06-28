@@ -106,12 +106,36 @@ model标签
  </div> 
  </body> 
  ```
+方式5(可以定义一个全局函数对model数据进行干预):
+ ```html
+  <body> 
+ <div class="container"> 
+ <div class="table-responsive" h-model="{data:{render:'modelRender',url:'http://api.huceo.com/txapi/chengyu/?key=0e70bfd01018c4404e24e68c73255d81&word=%E9%A9%AC%E5%88%B0%E6%88%90%E5%8A%9F'}}"> 
+ <h3 h-text="{data.newslist[0].chengyu}">成语 
+ </div> 
+ </div> 
+ </body> 
+ ```
+ ```javascript
+ function modelRender(modelName, res) { 
+   console.info("model名称" + modelName); 
+   console.info(res); 
+   if(!res){//失败 
+   return {error: '错误'}; 
+   } 
+   if (modelName == 'data') { //可以对model数据进行修改 
+   res.newslist[0].chengyu = res.newslist[0].chengyu + '(修改)'; 
+   return res; 
+   } 
+ } 
+ ```
+ 
 model标签作用域
 只有model标签的子节点才能获得model数据，不同块model数据相互独立不影响，但是单个页面model名称还是建议不要相同
 
 [model标签测试例子](http://parky18.github.io/demo/examples/test_model.html)  
 [嵌套model测试例子](http://parky18.github.io/demo/examples/test_nest_model.html)  
-
+[自定义修改model数据例子](http://parky18.github.io/demo/examples/test_render_model.html)  
 model请求参数
 --------
 
