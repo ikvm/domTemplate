@@ -16,7 +16,7 @@
             var t = this;
             t.template = template;
             t.options=options||{};
-            t.escape=escape||true;
+            t.escape=escape === undefined?true:escape;
             var codeExp = /\{([^}>]+)?}/g, reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];', match, cursor = 0;
 
             var addCode = function (line, isJs) {
@@ -34,8 +34,8 @@
              */
             function tpl(template, options,escape) {
                 template = template || t.template;
-                options=options|| t.options;
-                escape=escape|| t.escape;
+                options=options || t.options;
+                escape=escape === undefined?t.escape:escape;
                 if (typeof template !== 'string') {
                     throw new Error('Template must be a string');
                 }
