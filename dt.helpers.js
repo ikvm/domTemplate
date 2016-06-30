@@ -1,12 +1,6 @@
 /**
- * Created by Parky on 2016/5/30.
+ * 扩展函数
  */
-// 对Date的扩展，将 Date 转化为指定格式的String
-// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
-// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
-// 例子：
-// (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2016-06-02 08:09:04.423
-// (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2016-6-2 8:9:4.18
 (function ($) {
 
     "use strict";
@@ -38,6 +32,28 @@
     $.domTemplate.registerHelper('dateFormat', function (value, pattern) {
         pattern = pattern || 'yyyy-MM-dd';
         return dateFormat(value,pattern);
+    });
+
+    function isArray(arr) {
+        return Object.prototype.toString.apply(arr) === '[object Array]';
+    }
+
+    $.domTemplate.registerHelper('toList', function (obj) {
+        if(typeof obj==="undefined"){
+            return [];
+        }else if(isArray(obj)){
+            return obj;
+        }else{
+            return [obj];
+        }
+    });
+
+    $.domTemplate.registerHelper('defaultIsEmpty', function (value,defaultStr) {
+        if(typeof value==="undefined"||defaultStr==''){
+            return defaultStr;
+        }else{
+            return value;
+        }
     });
 
 })($);
