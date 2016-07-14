@@ -37,7 +37,7 @@
         if (ctx) {
             this.options.parentCtx = ctx;
             //deep copy
-            this.options.data = $.extend({}, this.options.parentCtx.options.data);
+            this.options.data = $.extend({},this.options.data, this.options.parentCtx.options.data);
         }
         this.options.prefixLength = this.options.prefix.length;
         this.options.$parentElement = this.options.$parentElement || $(this.options.selector);
@@ -219,6 +219,7 @@
     DataLoader.prototype = {
         setValue: function (value) {
             var me = this;
+
             if (isFunction(me.options.render)) {
                 value = me.options.render(me.name, value);
             } else if (me.options.render && me.options.render in window) {
@@ -227,6 +228,8 @@
             var data = $.extend(value, me.model.options.methods);
             if (me.model.options.ctx) {
                 me.model.options.ctx.options.data[me.name] = data;
+            }else if (me.model.options.parentCtx) {
+                me.model.options.parentCtx.options.data[me.name] = data;
             }
             me.model.options.data[me.name] = value;
             me.data = data;
@@ -280,6 +283,7 @@
             selector: '',
             data: {}
         }, options);
+
         this.name = this.options.name = this.options.name || "model_" + $.dt.generateId();
         if (this.options.params) {
             this.options.dataLoader = new DataLoader({}, this, this.name, this.options.params);
@@ -293,7 +297,7 @@
     Model.prototype = {
         data: function (data) {
             if (typeof data === "undefined") {
-                return $.extend(this.options.data[this.name], this.options.methods);
+               return $.extend(this.options.data[this.name], this.options.methods);
             } else {
                 data = $.extend(data, this.options.methods);
                 if (this.options.ctx) {
@@ -412,9 +416,14 @@
             try {
                 if (!this.isError()) {
                     if (!this.options.parsed) {
+
                         this.options.parsed = true;
+                        var _dataName=this.name;
+                        var _data={};
+                        _data[_dataName]=this.data();
+
                         this.options.ctx = this.options.ctx || new Context({
-                            data: this.data(),
+                            data: _data,
                             name: this.options.name,
                             $parentElement: this.options.modelEl
                         }, this.options.parentCtx);
@@ -434,8 +443,8 @@
                     this.parent.execute(this.options.parentCtx);
                 }
             } catch (e) {
-                this.isError(true);
                 console.error(e);
+                this.isError(true);
             }
             if (this.options.callback) {
                 this.options.callback(this);
@@ -580,7 +589,6 @@
                     return [ctx.options.rootModel];
                 } else {
                     return [new Model({name: 'root', modelEl: $modelItem, parentCtx: ctx})];
-                    ;
                 }
             }
             var modelParams = toJson(template);
@@ -662,6 +670,10 @@
         isEachChunk: function ($el) {//含有itemKey的属性的，表示each循环的模板，each模板只在each标签逻辑中执行一次
             return $el.closest(this.itemKeyAttr).length > 0;
         },
+        isNestEachChunk: function ($el,ctx) {//是否是嵌套h-each标签
+            var tagAttrName="["+this.tagName(ctx)+"]";
+            return $el.parent().closest(tagAttrName).length > 0;
+        },
         isEachItem: function ($el) {//含有itemKey的属性的，表示each循环的模板，each模板只在each标签逻辑中执行一次
             return $el.attr(this.itemKeyAttr).length > 0;
         },
@@ -675,8 +687,13 @@
             var me = this;
             var tagName = this.tagName(ctx);
             var $items = ctx.options.$parentElement.find('[' + tagName + ']');
+            var $currentEl,isNestEachChunk=false;
             $items.each(function (index, item) {
-                me.render(ctx, item, level);
+                $currentEl=$(item);
+                isNestEachChunk = me.isNestEachChunk($currentEl,ctx);
+                if(!isNestEachChunk || level>1){//嵌套each不执行
+                    me.render(ctx, $currentEl, level);
+                }
             });
             return this;
         },
@@ -721,7 +738,7 @@
                 ctx.options.$parentElement = ctx.options.$currentElement;
                 var needCleanTags = ctx.needCleanTags();
                 ctx.needCleanTags(false);
-                _domTemplate.fn.tagsExecutor(ctx, level++);
+                _domTemplate.fn.tagsExecutor(ctx, ++level);
                 //_domTemplate.fn.setDone($firstItemEl, this.name);
                 firstItemId = itemId;
                 $firstItemEl.attr("id", itemId);
@@ -745,7 +762,7 @@
 
                     $firstItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
                     ctx.cleanDoneTag();
-                    _domTemplate.fn.tagsExecutor(ctx, level++);
+                    _domTemplate.fn.tagsExecutor(ctx, ++level);
                     $firstItemEl.attr(this.itemKey, firstItemId);
                     $firstItemEl.attr(tagName, tagValue);
                 } else {//清空分页和无限上拉刷新
@@ -753,7 +770,7 @@
                     $lashItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
                     ctx.cleanDoneTag();
                     ctx.needCleanTags(true);
-                    _domTemplate.fn.tagsExecutor(ctx, level++);
+                    _domTemplate.fn.tagsExecutor(ctx, ++level);
                     $lashItemEl.attr(this.itemKey, firstItemId);
                 }
 
@@ -766,9 +783,9 @@
             return {$firstItemEl: $firstItemEl, $lashItemEl: $lashItemEl, firstItemId: firstItemId};
         },
 
-        render: function (parentCtx, item, level) {
+        render: function (parentCtx, $currentEl, level) {
             var me = this;
-            var $firstItemEl = $(item);
+            var $firstItemEl = $currentEl;
             var $parentElement = $firstItemEl.parent();
             var ctx = new Context({$parentElement: $parentElement, $currentElement: $firstItemEl}, parentCtx);
             ctx.modelCtx = parentCtx;
