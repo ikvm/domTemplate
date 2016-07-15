@@ -37,7 +37,7 @@
         if (ctx) {
             this.options.parentCtx = ctx;
             //deep copy
-            this.options.data = $.extend({},this.options.data, this.options.parentCtx.options.data);
+            this.options.data = $.extend({}, this.options.data, this.options.parentCtx.options.data);
         }
         this.options.prefixLength = this.options.prefix.length;
         this.options.$parentElement = this.options.$parentElement || $(this.options.selector);
@@ -228,7 +228,7 @@
             var data = $.extend(value, me.model.options.methods);
             if (me.model.options.ctx) {
                 me.model.options.ctx.options.data[me.name] = data;
-            }else if (me.model.options.parentCtx) {
+            } else if (me.model.options.parentCtx) {
                 me.model.options.parentCtx.options.data[me.name] = data;
             }
             me.model.options.data[me.name] = value;
@@ -297,7 +297,8 @@
     Model.prototype = {
         data: function (data) {
             if (typeof data === "undefined") {
-               return $.extend(this.options.data[this.name], this.options.methods);
+                data = this.options.data[this.name] || {};
+                return $.extend(data, this.options.methods);
             } else {
                 data = $.extend(data, this.options.methods);
                 if (this.options.ctx) {
@@ -418,9 +419,9 @@
                     if (!this.options.parsed) {
 
                         this.options.parsed = true;
-                        var _dataName=this.name;
-                        var _data={};
-                        _data[_dataName]=this.data();
+                        var _dataName = this.name;
+                        var _data = {};
+                        _data[_dataName] = this.data();
 
                         this.options.ctx = this.options.ctx || new Context({
                             data: _data,
@@ -464,7 +465,7 @@
     var _domTemplate = {};
 
     _domTemplate.fn = DomTemplate.prototype = {
-        version: '1.0.9',
+        version: '1.0.10',
         doneTagsKey: 'done-tags',
         idIndex: 0,
         supportAttrs: ['text', 'val', 'html', 'href', 'src', 'class', 'css', 'width', 'height', 'name', 'id', 'title', 'alt'],
@@ -667,11 +668,11 @@
         tagNameAttr: function (ctx) {
             return '[' + this.tagName(ctx) + ']';
         },
-        isEachChunk: function ($el) {//含有itemKey的属性的，表示each循环的模板，each模板只在each标签逻辑中执行一次
+        isEachChunk: function ($el, ctx) {//含有itemKey的属性的，表示each循环的模板，each模板只在each标签逻辑中执行一次
             return $el.closest(this.itemKeyAttr).length > 0;
         },
-        isNestEachChunk: function ($el,ctx) {//是否是嵌套h-each标签
-            var tagAttrName="["+this.tagName(ctx)+"]";
+        isNestEachChunk: function ($el, ctx) {//是否是嵌套h-each标签
+            var tagAttrName = "[" + this.tagName(ctx) + "]";
             return $el.parent().closest(tagAttrName).length > 0;
         },
         isEachItem: function ($el) {//含有itemKey的属性的，表示each循环的模板，each模板只在each标签逻辑中执行一次
@@ -683,16 +684,16 @@
          * @param level 嵌套层次默认1
          * @returns {_domTemplate.fn.eachTag}
          */
-        execute: function (ctx, level) {
+        execute: function (ctx, level, isTemplateItem) {
             var me = this;
             var tagName = this.tagName(ctx);
             var $items = ctx.options.$parentElement.find('[' + tagName + ']');
-            var $currentEl,isNestEachChunk=false;
+            var $currentEl, isNestEachChunk = false;
             $items.each(function (index, item) {
-                $currentEl=$(item);
-                isNestEachChunk = me.isNestEachChunk($currentEl,ctx);
-                if(!isNestEachChunk || level>1){//嵌套each不执行
-                    me.render(ctx, $currentEl, level);
+                $currentEl = $(item);
+                isNestEachChunk = me.isNestEachChunk($currentEl, ctx);
+                if (!isNestEachChunk || level > 1) {//嵌套each不执行
+                    me.render(ctx, $currentEl, level, isTemplateItem);
                 }
             });
             return this;
@@ -729,24 +730,27 @@
             });
             $currentElement.hide();
         },
-        addItem: function (level, ctx, iterStat, $parentElement, $firstItemEl, $lashItemEl, firstItemId) {
+        addItem: function (level, isTemplateItem, ctx, iterStat, $parentElement, $firstItemEl, $lashItemEl, firstItemId) {
             var itemId = ctx.modelCtx.generateId();
             var tagName = this.tagName(ctx);
             if ($lashItemEl == null || $lashItemEl.length == 0) {//第一列
                 $firstItemEl.show();
                 $firstItemEl.removeAttr(this.itemKey);
+                if (level > 1 && !isTemplateItem) {
+                    $firstItemEl.removeAttr(tagName);
+                }
                 ctx.options.$parentElement = ctx.options.$currentElement;
-                var needCleanTags = ctx.needCleanTags();
+                //var needCleanTags = ctx.needCleanTags();
                 ctx.needCleanTags(false);
-                _domTemplate.fn.tagsExecutor(ctx, ++level);
+                _domTemplate.fn.tagsExecutor(ctx, ++level, isTemplateItem);
                 //_domTemplate.fn.setDone($firstItemEl, this.name);
                 firstItemId = itemId;
                 $firstItemEl.attr("id", itemId);
                 $firstItemEl.attr(this.itemKey, firstItemId);
                 $lashItemEl = $firstItemEl;
-                if (needCleanTags) {
-                    ctx.cleanTags(tagName);
-                }
+                //if (needCleanTags) {
+                //    ctx.cleanTags(tagName);
+                //}
             } else {
                 var $appendEl = $firstItemEl.clone();
                 $appendEl.attr("id", itemId);
@@ -762,7 +766,7 @@
 
                     $firstItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
                     ctx.cleanDoneTag();
-                    _domTemplate.fn.tagsExecutor(ctx, ++level);
+                    _domTemplate.fn.tagsExecutor(ctx, ++level, false);
                     $firstItemEl.attr(this.itemKey, firstItemId);
                     $firstItemEl.attr(tagName, tagValue);
                 } else {//清空分页和无限上拉刷新
@@ -770,7 +774,7 @@
                     $lashItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
                     ctx.cleanDoneTag();
                     ctx.needCleanTags(true);
-                    _domTemplate.fn.tagsExecutor(ctx, ++level);
+                    _domTemplate.fn.tagsExecutor(ctx, ++level, false);
                     $lashItemEl.attr(this.itemKey, firstItemId);
                 }
 
@@ -783,7 +787,7 @@
             return {$firstItemEl: $firstItemEl, $lashItemEl: $lashItemEl, firstItemId: firstItemId};
         },
 
-        render: function (parentCtx, $currentEl, level) {
+        render: function (parentCtx, $currentEl, level, isTemplateItem) {
             var me = this;
             var $firstItemEl = $currentEl;
             var $parentElement = $firstItemEl.parent();
@@ -841,7 +845,7 @@
                     even: even,
                     odd: odd
                 };
-                var $el = me.addItem(level, ctx, ctx.options.data[iterStat], $parentElement, $firstItemEl, $lastItemEl, firstItemId);
+                var $el = me.addItem(level, isTemplateItem, ctx, ctx.options.data[iterStat], $parentElement, $firstItemEl, $lastItemEl, firstItemId);
                 $firstItemEl = $el.$firstItemEl;
                 $lastItemEl = $el.$lashItemEl;
                 firstItemId = $el.firstItemId;
@@ -850,9 +854,9 @@
             });
             $firstItemEl.attr(this.itemKey, firstItemId ? firstItemId : '');
 
-            if (ctx.needCleanTags() && level > 1) {
-                ctx.cleanTags(this.tagName(ctx), $firstItemEl);
-            }
+            //if (ctx.needCleanTags() && level > 1) {
+            //    ctx.cleanTags(this.tagName(ctx), $firstItemEl);
+            //}
             _domTemplate.fn.setDone($firstItemEl, this.name);
         }
     };
@@ -861,9 +865,11 @@
      * 标签执行器
      * @param ctx
      */
-    _domTemplate.fn.tagsExecutor = function (ctx, level) {
+    _domTemplate.fn.tagsExecutor = function (ctx, level, isTemplateItem) {
         level = level || 1;
-        _domTemplate.fn.eachTag.execute(ctx, level);//递归执行each标签
+        isTemplateItem = typeof isTemplateItem === 'undefined'||isTemplateItem ? true : isTemplateItem;
+
+        _domTemplate.fn.eachTag.execute(ctx, level, isTemplateItem);//递归执行each标签
 
         var attrListStr = _domTemplate.fn.supportAttrs.join('],[' + ctx.options.prefix);
         attrListStr = '[' + ctx.options.prefix + attrListStr + ']';
@@ -983,17 +989,6 @@
             caseName: function (ctx) {
                 return ctx.options.prefix + 'case';
             },
-            render: function (ctx, name, exp) {
-                var result = ctx.compile(exp);
-                var $el = ctx.options.$currentElement;
-                var $caseEl = $el.find('[' + this.caseName(ctx) + '="' + result + '"]');
-                $caseEl = $caseEl.length > 0 ? $caseEl : $el.find('[' + this.caseName(ctx) + '="*"]');
-                $el.empty();
-                $el.html($caseEl.clone());
-            }
-        },
-        'todo': {
-            name: 'todo',
             render: function (ctx, name, exp) {
                 var result = ctx.compile(exp);
                 var $el = ctx.options.$currentElement;
