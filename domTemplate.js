@@ -133,9 +133,6 @@
                         case 'text':
                             $el.text(attr);
                             break;
-                        case 'class':
-                            $el.toggleClass(attr);
-                            break;
                         case 'css':
                             var pairs = attr.split(";");
                             var pair;
@@ -468,7 +465,7 @@
         version: '1.0.10',
         doneTagsKey: 'done-tags',
         idIndex: 0,
-        supportAttrs: ['text', 'val', 'html', 'href', 'src', 'class', 'css', 'width', 'height', 'name', 'id', 'title', 'alt'],
+        supportAttrs: ['text', 'val', 'html', 'href', 'src', 'class', 'type','css', 'width', 'height', 'name', 'id', 'title', 'alt'],
         rootModel: {},
         models: {},
 
