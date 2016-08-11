@@ -14,6 +14,8 @@
 
     $.dt = $.domTemplate = DomTemplate;
 
+    var Cache = {};//模板缓存
+
     /**
      * 渲染数据上下文
      * @param options
@@ -462,7 +464,7 @@
     var _domTemplate = {};
 
     _domTemplate.fn = DomTemplate.prototype = {
-        version: '1.0.10',
+        version: '1.1.0',
         doneTagsKey: 'done-tags',
         idIndex: 0,
         supportAttrs: ['text', 'val', 'html', 'href', 'src', 'class', 'type','css', 'width', 'height', 'name', 'id', 'title', 'alt'],
@@ -655,6 +657,7 @@
 
     _domTemplate.fn.eachTag = {
         name: 'each',
+        tlpId: 'tpl-id',
         lastItemIdKey: "last_id",
         itemKey: "itemKey",
         itemKeyAttr: '[itemKey]',
@@ -730,56 +733,51 @@
         addItem: function (level, isTemplateItem, ctx, iterStat, $parentElement, $firstItemEl, $lashItemEl, firstItemId) {
             var itemId = ctx.modelCtx.generateId();
             var tagName = this.tagName(ctx);
-            if ($lashItemEl == null || $lashItemEl.length == 0) {//第一列
-                $firstItemEl.show();
+            if(null==$lashItemEl || $lashItemEl.length == 0){//第一列模板
                 $firstItemEl.removeAttr(this.itemKey);
-                if (level > 1 && !isTemplateItem) {
-                    $firstItemEl.removeAttr(tagName);
-                }
-                ctx.options.$parentElement = ctx.options.$currentElement;
-                //var needCleanTags = ctx.needCleanTags();
-                ctx.needCleanTags(false);
-                _domTemplate.fn.tagsExecutor(ctx, ++level, isTemplateItem);
-                //_domTemplate.fn.setDone($firstItemEl, this.name);
                 firstItemId = itemId;
                 $firstItemEl.attr("id", itemId);
                 $firstItemEl.attr(this.itemKey, firstItemId);
                 $lashItemEl = $firstItemEl;
-                //if (needCleanTags) {
-                //    ctx.cleanTags(tagName);
-                //}
-            } else {
-                var $appendEl = $firstItemEl.clone();
-                $appendEl.attr("id", itemId);
-                var tagValue = $appendEl.attr(tagName);
-                $appendEl.removeAttr(tagName);
-                $appendEl.removeAttr(this.lastItemIdKey);
-                $appendEl.removeAttr(this.itemKey);
-                if (ctx.modelCtx.options.appendType === 'before') {//下拉刷新
-                    $firstItemEl.before($appendEl);
-
+                itemId = ctx.modelCtx.generateId();
+                if(level>1){
                     $firstItemEl.removeAttr(tagName);
-                    $firstItemEl.removeAttr(this.lastItemIdKey);
-
-                    $firstItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
-                    ctx.cleanDoneTag();
-                    _domTemplate.fn.tagsExecutor(ctx, ++level, false);
-                    $firstItemEl.attr(this.itemKey, firstItemId);
-                    $firstItemEl.attr(tagName, tagValue);
-                } else {//清空分页和无限上拉刷新
-                    $lashItemEl.after($appendEl);
-                    $lashItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
-                    ctx.cleanDoneTag();
-                    ctx.needCleanTags(true);
-                    _domTemplate.fn.tagsExecutor(ctx, ++level, false);
-                    $lashItemEl.attr(this.itemKey, firstItemId);
+                    $firstItemEl.hide();
                 }
-
             }
+
+            var $appendEl = $firstItemEl.clone();
+            $appendEl.show();
+
+            $appendEl.attr("id", itemId);
+            var tagValue = $appendEl.attr(tagName);
+            $appendEl.removeAttr(tagName);
+            $appendEl.removeAttr(this.lastItemIdKey);
+            $appendEl.removeAttr(this.itemKey);
+            if (ctx.modelCtx.options.appendType === 'before') {//下拉刷新
+                $firstItemEl.before($appendEl);
+
+                $firstItemEl.removeAttr(tagName);
+                $firstItemEl.removeAttr(this.lastItemIdKey);
+
+                $firstItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
+                ctx.cleanDoneTag();
+                _domTemplate.fn.tagsExecutor(ctx, ++level, false);
+                $firstItemEl.attr(this.itemKey, firstItemId);
+                $firstItemEl.attr(tagName, tagValue);
+            } else {//清空分页和无限上拉刷新
+
+                $lashItemEl.after($appendEl);
+                $lashItemEl = ctx.options.$currentElement = ctx.options.$parentElement = $parentElement.find('#' + itemId);
+                ctx.cleanDoneTag();
+                ctx.needCleanTags(true);
+                _domTemplate.fn.tagsExecutor(ctx, ++level, false);
+                $lashItemEl.attr(this.itemKey, firstItemId);
+            }
+
             if (iterStat.last) {
                 $firstItemEl.attr(this.lastItemIdKey, itemId);
             }
-            //_domTemplate.fn.setDone($firstItemEl, this.name);
 
             return {$firstItemEl: $firstItemEl, $lashItemEl: $lashItemEl, firstItemId: firstItemId};
         },
@@ -813,6 +811,9 @@
             var lastItemId = $firstItemEl.attr(this.lastItemIdKey);
             if (lastItemId && lastItemId !== $firstItemEl.attr('id')) {
                 $lastItemEl = $parentElement.find('#' + lastItemId);
+                if($lastItemEl.length==0){
+                    $lastItemEl=null;
+                }
             }
 
             var firstItemId = $firstItemEl.attr("id"), first = true, last = false, even = false, odd = false, index = 0, length = object.length,
@@ -851,9 +852,6 @@
             });
             $firstItemEl.attr(this.itemKey, firstItemId ? firstItemId : '');
 
-            //if (ctx.needCleanTags() && level > 1) {
-            //    ctx.cleanTags(this.tagName(ctx), $firstItemEl);
-            //}
             _domTemplate.fn.setDone($firstItemEl, this.name);
         }
     };
